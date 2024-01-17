@@ -10,6 +10,8 @@
  * @author mroblesdev
  */
 
+$nombre_sistema = $this->db->get_where("configuracion", array('nombre' => 'tienda_nombre'))->row()->valor;
+
 ?>
 
 <!DOCTYPE html>
@@ -41,9 +43,11 @@
 <body class="sb-nav-fixed">
 	<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 		<!-- Navbar Brand-->
-		<a class="navbar-brand ps-3" href="<?php echo site_url('inicio'); ?>"><?php echo $this->db->get_where("configuracion", array('nombre' => 'tienda_nombre'))->row()->valor; ?></a>
+		<a class="navbar-brand ps-3" href="<?php echo site_url('inicio'); ?>"><?php echo $nombre_sistema; ?></a>
 		<!-- Sidebar Toggle-->
-		<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+		<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
+			<i class="fas fa-bars"></i>
+		</button>
 		<!-- Navbar-->
 		<ul class="navbar-nav ms-auto me-0 me-md-3 me-lg-4">
 			<li class="nav-item dropdown">

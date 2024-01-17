@@ -20,28 +20,34 @@ class Usuarios_model extends CI_Model
 		$this->load->database();
 	}
 
-	public function login()
+	public function login($usuario, $password)
 	{
-		$usuario = $this->input->post('usuario');
-		$password = $this->input->post('password');
-
 		$query = $this->db->get_where('usuarios', array('usuario' => $usuario, 'activo' => 1));
 
 		if ($query->num_rows() > 0) {
 			$row = $query->row();
 
 			if (password_verify($password, $row->password)) {
-				$this->session->set_userdata('login', $row->activo);
-				$this->session->set_userdata('id_usuario', $row->id);
-				$this->session->set_userdata('usuario', $row->usuario);
-				$this->session->set_userdata('nombre', $row->nombre);
-				$this->session->set_userdata('id_rol', $row->id_rol);
-				$this->session->set_userdata('id_caja', $row->id_caja);
+				$this->configurar_sesion($row);
 
 				return true;
 			}
 		}
-		$this->session->unset_userdata('user_data');
+
 		return false;
+	}
+
+	private function configurar_sesion($row)
+	{
+		$userdata = array(
+			'login' => true,
+			'id_usuario' => $row->id,
+			'usuario' => $row->usuario,
+			'nombre' => $row->nombre,
+			'id_rol' => $row->id_rol,
+			'id_caja' => $row->id_caja
+		);
+
+		$this->session->set_userdata($userdata);
 	}
 }

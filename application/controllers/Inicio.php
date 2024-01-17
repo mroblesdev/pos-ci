@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -13,17 +14,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Inicio extends CI_Controller
 {
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->load->database();
+		$this->load->library('session');
 	}
 
 	//Carga vista inicio de sesion
 	public function index()
 	{
-		if ($this->session->userdata('login') != 1) {
-			redirect('login');
+		if ($this->session->userdata('login') === false) {
+			redirect(base_url());
 		}
 
 		$this->load->view('header');

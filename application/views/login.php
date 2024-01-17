@@ -43,11 +43,11 @@
 									<!-- Formulario de inicio de seisón -->
 									<form action="<?php echo site_url('auth/verifica') ?>" method="POST" autocomplete="off">
 										<div class="form-floating mb-3">
-											<input class="form-control" id="usuario" name="usuario" type="text" placeholder="Usuario" value="<?php echo set_value('usuario') ?>" required autofocus />
+											<input class="form-control" id="usuario" name="usuario" type="text" placeholder="Usuario" value="<?php echo set_value('usuario') ?>" required autofocus>
 											<label for="usuario">Usuario</label>
 										</div>
 										<div class="form-floating mb-3">
-											<input class="form-control" id="password" name="password" type="password" placeholder="Contraseña" required />
+											<input class="form-control" id="password" name="password" type="password" placeholder="Contraseña" required>
 											<label for="password">Contraseña</label>
 										</div>
 
