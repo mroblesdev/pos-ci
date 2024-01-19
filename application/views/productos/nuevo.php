@@ -14,9 +14,13 @@
 
 <h4 class="mt-3">Agregar producto</h4>
 
+<!-- Mensajes de validación -->
 <?php if (validation_errors()) : ?>
-	<div class="alert alert-danger" role="alert">
-		<?php echo validation_errors();  ?>
+	<div class="alert alert-danger alert-dismissible fade show col-md-6" role="alert">
+		<ul>
+			<?php echo validation_errors('<li>', '</li>');  ?>
+		</ul>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	</div>
 <?php endif; ?>
 
@@ -34,7 +38,7 @@
 
 	<div class="col-md-4">
 		<label for="tipo_venta" class="form-label"><span class="text-danger">*</span> Se vende por</label>
-		<select class="form-select" name="tipo_venta" id="tipo_venta">
+		<select class="form-select" name="tipo_venta" id="tipo_venta" required>
 			<option value="P">Unidad / Pieza</option>
 			<option value="G">Granel (con decimales)</option>
 		</select>
@@ -46,21 +50,21 @@
 	</div>
 
 	<div class="col-md-4">
-		<label for="precio_compra" class="form-label"><span class="text-danger">*</span> Precio de compra</label>
-		<input type="text" class="form-control" id="precio_compra" name="precio_compra" value="<?php echo set_value('precio_compra', '0.00') ?>" onkeypress="return validateDecimal(this.value);" required>
+		<label for="precio_compra" class="form-label">Precio de compra</label>
+		<input type="text" class="form-control" id="precio_compra" name="precio_compra" value="<?php echo set_value('precio_compra', '0.00') ?>" onkeypress="return validateDecimal(this.value);">
 	</div>
 
 	<div class="col-md-4">
 		<label for="inventariable" class="form-label"><span class="text-danger">*</span> Es inventariable</label>
-		<select class="form-select" name="inventariable" id="inventariable">
+		<select class="form-select" name="inventariable" id="inventariable" required>
 			<option value="1">Si</option>
 			<option value="0">No</option>
 		</select>
 	</div>
 
 	<div class="col-md-4">
-		<label for="existencia" class="form-label"><span class="text-danger">*</span> Existencia actual</label>
-		<input type="text" class="form-control" id="existencia" name="existencia" value="<?php echo set_value('existencia', '0') ?>" required>
+		<label for="existencia" class="form-label">Existencia actual</label>
+		<input type="text" class="form-control" id="existencia" name="existencia" value="<?php echo set_value('existencia', '0') ?>">
 	</div>
 
 	<div class="col-12">

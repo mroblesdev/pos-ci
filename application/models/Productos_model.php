@@ -20,37 +20,47 @@ class Productos_model extends CI_Model
 		$this->load->database();
 	}
 
-	//Obtener productos, recibe activo 1 o 0
+	// Obtener productos, recibe activo 1 o 0
 	public function obtener($activo = 1)
 	{
 		$this->db->order_by('codigo', 'ASC');
 		return $this->db->get_where("productos", array('activo' => $activo))->result();
 	}
 
-	//Consulta producto por ID
+	// Consulta producto por ID
 	public function porId($id)
 	{
 		return $this->db->get_where("productos", ["id" => $id])->row();
 	}
 
-	//Consulta producto por codigo
+	// Consulta producto por codigo
 	public function porCodigo($codigo)
 	{
 		return $this->db->get_where("productos", ["codigo" => $codigo, "activo" => 1]);
 	}
 
-	//Consulta producto por codigo
+	// Consulta producto por codigo
 	public function porCodigoRes($codigo)
 	{
 		return $this->db->get_where("productos", ["codigo" => $codigo, "activo" => 1])->row();
 	}
-	//Consulta producto por existecia
+
+	// Consulta si el código ya existe para otros registro
+	public function existeCodigo($codigo, $idProducto)
+	{
+		return $this->db->where('codigo', $codigo)
+			->where('id !=', $idProducto)
+			->get('productos')
+			->row();
+	}
+
+	// Consulta producto por existecia
 	public function porExistencia($existencia)
 	{
 		return $this->db->get_where("productos", ["existencia" => $existencia, "activo" => 1])->result();
 	}
 
-	//Insertar producto
+	// Insertar producto
 	public function insertar()
 	{
 		$codigo = $this->input->post("codigo");
@@ -76,7 +86,7 @@ class Productos_model extends CI_Model
 		return $this->db->insert("productos", $datos);
 	}
 
-	//Actualiza producto
+	// Actualiza producto
 	public function actualizar($id)
 	{
 		$codigo = $this->input->post("codigo");
@@ -101,14 +111,14 @@ class Productos_model extends CI_Model
 		return $this->db->update("productos", $datos);
 	}
 
-	//Actualiza activo de producto a 0
+	// Actualiza activo de producto a 0
 	public function eliminar($id)
 	{
 		$datos = ["activo" => 0];
 		return $this->db->update("productos", $datos, ["id" => $id]);
 	}
 
-	//Actualiza activo de producto a 1
+	// Actualiza activo de producto a 1
 	public function reingresar($id)
 	{
 		$datos = ["activo" => 1];

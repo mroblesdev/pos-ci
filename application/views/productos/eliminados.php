@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Vista de catálogo de productos
+ * Vista de catálogo de productos eliminados
  *
- * Esta vista proporciona una tabla para mostrar los productos con opciones
- * para agregar, editar, elimianr y ver registro eliminados.
+ * Esta vista proporciona una tabla para mostrar los productos eliminados
+ * con la opción para reingresar los registros.
  *
  * @version 1.0
  * @link https://github.com/mroblesdev/pos-ci
@@ -13,7 +13,7 @@
 
 ?>
 
-<h4 class="mt-3">Productos eliminados</h4>
+<h4 class="mt-3" id="titulo">Productos eliminados</h4>
 
 <div class="centrado">
 	<p>
@@ -22,7 +22,7 @@
 </div>
 
 <div class="table-responsive">
-	<table class="table table-bordered table-hover table-sm" id="dataTable" width="100%" cellspacing="0">
+	<table class="table table-bordered table-hover table-sm" id="dataTable" aria-describedby="titulo" style="width: 100%">
 		<thead>
 			<tr>
 				<th>C&oacute;digo</th>
@@ -30,7 +30,7 @@
 				<th>Precio Venta</th>
 				<th>Precio Compra</th>
 				<th>Existencia</th>
-				<th width="3%"></th>
+				<th style="width: 3%"></th>
 			</tr>
 		</thead>
 		<tbody>

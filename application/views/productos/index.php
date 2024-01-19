@@ -13,7 +13,7 @@
 
 ?>
 
-<h4 class="mt-3">Productos</h4>
+<h4 class="mt-3" id="titulo">Productos</h4>
 
 <div class="centrado">
 	<p>
@@ -23,7 +23,7 @@
 </div>
 
 <div class="table-responsive">
-	<table class="table table-bordered table-hover table-sm" id="dataTable" width="100%" cellspacing="0">
+	<table class="table table-bordered table-hover table-sm" id="dataTable" aria-describedby="titulo" style="width: 100%">
 		<thead>
 			<tr>
 				<th>C&oacute;digo</th>
@@ -31,8 +31,8 @@
 				<th>Precio Venta</th>
 				<th>Precio Compra</th>
 				<th>Existencia</th>
-				<th width="3%"></th>
-				<th width="3%"></th>
+				<th style="width: 3%"></th>
+				<th style="width: 3%"></th>
 			</tr>
 		</thead>
 		<tbody>
