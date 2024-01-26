@@ -33,10 +33,10 @@ $nombre_sistema = $this->db->get_where("configuracion", array('nombre' => 'tiend
 	<link href="<?php echo base_url('css/dataTables.bootstrap5.min.css'); ?>" rel="stylesheet">
 
 	<!-- Custom styles for this template-->
-	<link href="<?php echo base_url() ?>vendor/jquery-ui/jquery-ui.css" rel="stylesheet">
+	<link href="<?php echo base_url('js/jquery-ui/jquery-ui.min.css'); ?>" rel="stylesheet">
 
 	<script src="<?php echo base_url('js/jquery.min.js'); ?>"></script>
-	<script src="<?php echo base_url() ?>vendor/jquery-ui/jquery-ui.js"></script>
+	<script src="<?php echo base_url('js/jquery-ui/jquery-ui.min.js'); ?>"></script>
 
 </head>
 
@@ -82,23 +82,6 @@ $nombre_sistema = $this->db->get_where("configuracion", array('nombre' => 'tiend
 							<div class="sb-nav-link-icon"><i class="fa-solid fa-basket-shopping"></i></div>
 							Productos
 						</a>
-
-						<a class="nav-link" href="<?php echo site_url('clientes'); ?>">
-							<div class="sb-nav-link-icon"><i class="fa-solid fa-user-friends"></i></div>
-							Clientes
-						</a>
-
-						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCompras" aria-expanded="false" aria-controls="collapseCompras">
-							<div class="sb-nav-link-icon"><i class="fa-solid fa-truck"></i></div>
-							Compras
-							<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-						</a>
-						<div class="collapse" id="collapseCompras" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-							<nav class="sb-sidenav-menu-nested nav">
-								<a class="nav-link" href="<?php echo site_url('compras/nueva'); ?>">Nueva compra</a>
-								<a class="nav-link" href="<?php echo site_url('compras'); ?>">Compras</a>
-							</nav>
-						</div>
 
 						<a class="nav-link" href="<?php echo site_url('caja'); ?>">
 							<div class="sb-nav-link-icon"><i class="fa-solid fa-cash-register"></i></div>

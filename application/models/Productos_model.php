@@ -45,6 +45,16 @@ class Productos_model extends CI_Model
 		return $this->db->get_where("productos", ["codigo" => $codigo, "activo" => 1])->row();
 	}
 
+	// Obtener productos filtrando por código por LIKE
+	public function porCodigoLike($codigo = '')
+	{
+		return $this->db->like('codigo', $codigo)
+			->where('activo', 1)
+			->order_by('codigo', 'ASC')
+			->get('productos')
+			->result();
+	}
+
 	// Consulta si el código ya existe para otros registro
 	public function existeCodigo($codigo, $idProducto)
 	{

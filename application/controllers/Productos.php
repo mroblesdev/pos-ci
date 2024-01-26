@@ -256,4 +256,24 @@ class Productos extends CI_Controller
 		// El código es único
 		return true;
 	}
+
+	// Función para autocompletado de productos
+    public function autocompleteData()
+    {
+        $resultado = array();
+
+		$valor = $this->input->get('term');
+
+        $productos = $this->productos_model->porCodigoLike($valor);
+        if (!empty($productos)) {
+            foreach ($productos as $row) {
+                $data['id'] = $row->id;
+                $data['value'] = $row->codigo;
+                $data['label'] = $row->codigo . ' - ' . $row->nombre;
+                array_push($resultado, $data);
+            }
+        }
+
+        echo json_encode($resultado);
+    }
 }
