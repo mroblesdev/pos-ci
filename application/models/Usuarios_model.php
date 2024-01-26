@@ -30,17 +30,17 @@ class Usuarios_model extends CI_Model
 			if (password_verify($password, $row->password)) {
 				$this->configurar_sesion($row);
 
-				return true;
+				return TRUE;
 			}
 		}
 
-		return false;
+		return FALSE;
 	}
 
 	private function configurar_sesion($row)
 	{
 		$userdata = array(
-			'login' => true,
+			'login' => TRUE,
 			'id_usuario' => $row->id,
 			'usuario' => $row->usuario,
 			'nombre' => $row->nombre,

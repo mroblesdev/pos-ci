@@ -37,14 +37,6 @@
 	</div>
 
 	<div class="col-md-4">
-		<label for="tipo_venta" class="form-label"><span class="text-danger">*</span> Se vende por</label>
-		<select class="form-select" name="tipo_venta" id="tipo_venta" required>
-			<option value="P">Unidad / Pieza</option>
-			<option value="G">Granel (con decimales)</option>
-		</select>
-	</div>
-
-	<div class="col-md-4">
 		<label for="precio_venta" class="form-label"><span class="text-danger">*</span> Precio de venta</label>
 		<input type="text" class="form-control" id="precio_venta" name="precio_venta" value="<?php echo set_value('precio_venta', '0.00') ?>" onkeypress="return validateDecimal(this.value);" required>
 	</div>

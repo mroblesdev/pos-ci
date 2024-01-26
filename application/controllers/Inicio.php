@@ -24,7 +24,7 @@ class Inicio extends CI_Controller
 	//Carga vista inicio de sesion
 	public function index()
 	{
-		if ($this->session->userdata('login') === false) {
+		if ($this->session->userdata('login') === FALSE) {
 			redirect(base_url());
 		}
 

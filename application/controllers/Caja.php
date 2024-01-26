@@ -39,9 +39,9 @@ class Caja extends CI_Controller
 
 		if ($this->input->is_ajax_request()) {
 
-			$codigo   = $this->input->post('codigo');
-			$cantidad = $this->input->post('cantidad');
-			$id_venta = $this->input->post('id_venta');
+			$codigo   = $this->input->post('codigo', TRUE);
+			$cantidad = $this->input->post('cantidad', TRUE);
+			$id_venta = $this->input->post('id_venta', TRUE);
 
 			$producto = $this->productos->where('codigo', $codigo)->first();
 

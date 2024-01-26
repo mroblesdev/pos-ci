@@ -61,12 +61,24 @@ class Productos extends CI_Controller
 		$this->form_validation->set_rules('precio_venta', 'precio de venta', 'required|numeric');
 		$this->form_validation->set_rules('precio_compra', 'precio de compra', 'numeric');
 		$this->form_validation->set_rules('existencia', 'existencia', 'numeric');
+
 		$this->form_validation->set_message('required', 'El campo {field} es obligatorio.');
 		$this->form_validation->set_message('numeric', 'El campo {field} debe contener solo números.');
 		$this->form_validation->set_message('is_unique', 'El campo {field} debe contener un valor único.');
 
+		$datos = array(
+			"codigo"        => $this->input->post("codigo", TRUE),
+			"nombre"        => $this->input->post("nombre", TRUE),
+			"precio_venta"  => preg_replace('([^0-9\.])', '', $this->input->post("precio_venta", TRUE)),
+			"precio_compra" => preg_replace('([^0-9\.])', '', $this->input->post("precio_compra", TRUE)),
+			"inventariable" => $this->input->post("inventariable", TRUE),
+			"existencia"    => preg_replace('([^0-9\.])', '', $this->input->post('existencia', TRUE)),
+			"activo"        => 1,
+			"fecha_alta"    => date('Y-m-d H:i:s')
+		);
+
 		if ($this->form_validation->run()) {
-			$resultado = $this->productos_model->insertar();
+			$resultado = $this->productos_model->insertar($datos);
 			if ($resultado) {
 				redirect("productos/");
 			}
@@ -99,12 +111,22 @@ class Productos extends CI_Controller
 		$this->form_validation->set_rules('precio_venta', 'precio de venta', 'required|numeric');
 		$this->form_validation->set_rules('precio_compra', 'precio de compra', 'numeric');
 		$this->form_validation->set_rules('existencia', 'existencia', 'numeric');
+
 		$this->form_validation->set_message('required', 'El campo {field} es obligatorio.');
 		$this->form_validation->set_message('numeric', 'El campo {field} debe contener solo números.');
 		$this->form_validation->set_message('is_unique', 'El campo {field} debe contener un valor único.');
 
+		$datos = array(
+			"codigo"        => $this->input->post("codigo", TRUE),
+			"nombre"        => $this->input->post("nombre", TRUE),
+			"precio_venta"  => preg_replace('([^0-9\.])', '', $this->input->post("precio_venta", TRUE)),
+			"precio_compra" => preg_replace('([^0-9\.])', '', $this->input->post("precio_compra", TRUE)),
+			"inventariable" => $this->input->post("inventariable", TRUE),
+			"existencia"    => preg_replace('([^0-9\.])', '', $this->input->post('existencia', TRUE))
+		);
+
 		if ($this->form_validation->run()) {
-			$resultado = $this->productos_model->actualizar($id);
+			$resultado = $this->productos_model->actualizar($id, $datos);
 
 			if ($resultado) {
 				redirect("productos/");
@@ -138,7 +160,7 @@ class Productos extends CI_Controller
 		$start = intval($this->input->post("start"));
 		$length = intval($this->input->post("length"));
 		$order = $this->input->post("order");
-		$search = $this->input->post("search");
+		$search = $this->input->post("search", TRUE);
 		$activo = $this->input->post("activo");
 		$searchValue  = $search['value'];
 		$col = 0;
@@ -250,30 +272,30 @@ class Productos extends CI_Controller
 		// Si se encuentra un producto con el mismo código
 		if ($resultado) {
 			$this->form_validation->set_message('check_codigo', 'El código ya está en uso por otro usuario.');
-			return false;
+			return FALSE;
 		}
 
 		// El código es único
-		return true;
+		return TRUE;
 	}
 
 	// Función para autocompletado de productos
-    public function autocompleteData()
-    {
-        $resultado = array();
+	public function autocompleteData()
+	{
+		$resultado = array();
 
-		$valor = $this->input->get('term');
+		$valor = $this->input->get('term', TRUE);
 
-        $productos = $this->productos_model->porCodigoLike($valor);
-        if (!empty($productos)) {
-            foreach ($productos as $row) {
-                $data['id'] = $row->id;
-                $data['value'] = $row->codigo;
-                $data['label'] = $row->codigo . ' - ' . $row->nombre;
-                array_push($resultado, $data);
-            }
-        }
+		$productos = $this->productos_model->porCodigoLike($valor);
+		if (!empty($productos)) {
+			foreach ($productos as $row) {
+				$data['id'] = $row->id;
+				$data['value'] = $row->codigo;
+				$data['label'] = $row->codigo . ' - ' . $row->nombre;
+				array_push($resultado, $data);
+			}
+		}
 
-        echo json_encode($resultado);
-    }
+		echo json_encode($resultado);
+	}
 }

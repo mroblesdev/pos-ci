@@ -29,20 +29,12 @@
 
 	<div class="col-md-4">
 		<label for="codigo" class="form-label"><span class="text-danger">*</span> Código</label>
-		<input type="text" class="form-control" id="codigo" name="codigo" value="<?php echo set_value('codigo', $producto->codigo, true); ?>" autofocus required>
+		<input type="text" class="form-control" id="codigo" name="codigo" value="<?php echo set_value('codigo', $producto->codigo); ?>" autofocus required>
 	</div>
 
 	<div class="col-md-8">
 		<label for="nombre" class="form-label"><span class="text-danger">*</span> Nombre</label>
-		<input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo set_value('nombre', $producto->nombre, true); ?>" required>
-	</div>
-
-	<div class="col-md-4">
-		<label for="tipo_venta" class="form-label"><span class="text-danger">*</span> Se vende por</label>
-		<select class="form-select" name="tipo_venta" id="tipo_venta">
-			<option value="P" <?php echo ($producto->tipo_venta == 'P') ? 'selected' : ''; ?>>Unidad / Pieza</option>
-			<option value="G" <?php echo ($producto->tipo_venta == 'G') ? 'selected' : ''; ?>>Granel (con decimales)</option>
-		</select>
+		<input type="text" class="form-control" id="nombre" name="nombre" value="<?php echo set_value('nombre', $producto->nombre); ?>" required>
 	</div>
 
 	<div class="col-md-4">

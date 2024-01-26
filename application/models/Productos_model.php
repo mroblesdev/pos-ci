@@ -71,52 +71,14 @@ class Productos_model extends CI_Model
 	}
 
 	// Insertar producto
-	public function insertar()
+	public function insertar($datos)
 	{
-		$codigo = $this->input->post("codigo");
-		$nombre = $this->input->post("nombre");
-		$tipoVenta = $this->input->post("tipo_venta");
-		$precioVenta = preg_replace('([^0-9\.])', '', $this->input->post("precio_venta"));
-		$precioCompra = preg_replace('([^0-9\.])', '', $this->input->post("precio_compra"));
-		$inventariable = $this->input->post("inventariable");
-		$existencia = preg_replace('([^0-9\.])', '', $this->input->post('existencia'));
-
-		$datos = array(
-			"codigo" => $codigo,
-			"nombre" => $nombre,
-			"tipo_venta" => $tipoVenta,
-			"precio_venta" => $precioVenta,
-			"precio_compra" => $precioCompra,
-			"inventariable" => $inventariable,
-			"existencia" => $existencia,
-			"activo" => 1,
-			"fecha_alta" => date('Y-m-d H:i:s')
-		);
-
 		return $this->db->insert("productos", $datos);
 	}
 
 	// Actualiza producto
-	public function actualizar($id)
+	public function actualizar($id, $datos)
 	{
-		$codigo = $this->input->post("codigo");
-		$nombre = $this->input->post("nombre");
-		$tipoVenta = $this->input->post("tipo_venta");
-		$precioVenta = preg_replace('([^0-9\.])', '', $this->input->post("precio_venta"));
-		$precioCompra = preg_replace('([^0-9\.])', '', $this->input->post("precio_compra"));
-		$inventariable = $this->input->post("inventariable");
-		$existencia = preg_replace('([^0-9\.])', '', $this->input->post('existencia'));
-
-		$datos = array(
-			"codigo" => $codigo,
-			"nombre" => $nombre,
-			"tipo_venta" => $tipoVenta,
-			"precio_venta" => $precioVenta,
-			"precio_compra" => $precioCompra,
-			"inventariable" => $inventariable,
-			"existencia" => $existencia,
-		);
-
 		$this->db->where('id', $id);
 		return $this->db->update("productos", $datos);
 	}

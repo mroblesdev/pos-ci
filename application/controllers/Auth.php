@@ -35,8 +35,8 @@ class Auth extends CI_controller
 		$this->form_validation->set_message('required', 'El campo {field} es obligatorio.');
 
 		if ($this->form_validation->run()) {
-			$usuario = $this->input->post('usuario');
-			$password = $this->input->post('password');
+			$usuario = $this->input->post('usuario', TRUE);
+			$password = $this->input->post('password', TRUE);
 
 			if ($this->usuarios_model->login($usuario, $password)) {
 				$this->eventos_model->insertar($this->session->userdata('id_usuario'), 'INICIO DE SESIÓN');
@@ -55,7 +55,7 @@ class Auth extends CI_controller
 	//Cierra sesion
 	public function logout()
 	{
-		if ($this->session->userdata('login') === true) {
+		if ($this->session->userdata('login') === TRUE) {
 			$this->eventos_model->insertar($this->session->userdata('id_usuario'), 'CIERRE DE SESIÓN');
 		}
 		$this->session->sess_destroy();
