@@ -41,75 +41,93 @@ class Caja extends CI_Controller
 
 			$codigo   = $this->input->post('codigo', TRUE);
 			$cantidad = $this->input->post('cantidad', TRUE);
-			$id_venta = $this->input->post('id_venta', TRUE);
+			$idVenta = $this->input->post('id_venta', TRUE);
 
-			$producto = $this->productos->where('codigo', $codigo)->first();
+			$this->load->model("productos_model");
+			$this->load->model("Temporal_caja_model");
 
-			if ($producto) {
+			$producto = $this->productos_model->porCodigoRes($codigo);
 
-				$datosExiste = $this->tmp_mov->porIdProductoMov($producto['id'], $id_venta);
-				if ($datosExiste) {
-					$cantidad = $datosExiste->cantidad + $cantidad;
-					if ($producto['inventariable'] == 1) {
-						if ($producto['existencias'] >= $cantidad) {
+			if (empty($producto)) {
+				$error = 'No existe el producto';
+			} else {
 
-							$subtotal = $cantidad * $datosExiste->precio;
+				$idProducto = $producto->id;
+				$productoCodigo = $producto->codigo;
+				$productoNombre = $producto->nombre;
+				$productoInventariable = $producto->inventariable;
+				$productoExistencia = $producto->existencia;
+				$productoPrecioVenta = $producto->precio_venta;
 
-							$this->tmp_mov->actualizarProductoMov($producto['id'], $id_venta, $cantidad, $subtotal);
-						} else {
-							$error = 'NO hay suficientes existencia';
-						}
-					} else {
-						$subtotal = $cantidad * $datosExiste->precio;
-						$this->tmp_mov->actualizarProductoMov($producto['id'], $id_venta, $cantidad, $subtotal);
-					}
+				$productoVenta = $this->Temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
+				$cantidad += $productoVenta ? $productoVenta->cantidad : 0;
+
+				if ($productoInventariable == 1 && $productoExistencia < $cantidad) {
+					$error = 'No hay suficientes existencias';
 				} else {
+					$subtotal = $cantidad * $productoPrecioVenta;
 
-					if ($producto['inventariable'] == 1) {
-						if ($producto['existencias'] >= $cantidad) {
+					$data = [
+						'id_venta' => $idVenta,
+						'id_producto' => $idProducto,
+						'codigo' => $productoCodigo,
+						'nombre' => $productoNombre,
+						'precio' => $productoPrecioVenta,
+						'cantidad' => $cantidad,
+						'importe' => $subtotal,
+					];
 
-							$subtotal = $cantidad * $producto['precio_venta'];
-
-							$this->tmp_mov->save([
-								'folio' => $id_venta,
-								'id_producto' => $producto['id'],
-								'codigo' => $producto['codigo'],
-								'nombre' => $producto['nombre'],
-								'precio' => $producto['precio_venta'],
-								'cantidad' => $cantidad,
-								'subtotal' => $subtotal,
-							]);
-						} else {
-							$error = 'No hay existencias';
-						}
+					if ($productoVenta) {
+						$this->Temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
 					} else {
-						$subtotal = $cantidad * $producto['precio_venta'];
-
-						$this->tmp_mov->save([
-							'folio' => $id_venta,
-							'id_producto' => $producto['id'],
-							'codigo' => $producto['codigo'],
-							'nombre' => $producto['nombre'],
-							'precio' => $producto['precio_venta'],
-							'cantidad' => $cantidad,
-							'subtotal' => $subtotal,
-						]);
+						$this->Temporal_caja_model->insertar($data);
 					}
 				}
-			} else {
-				$error = 'No existe el producto';
 			}
 
-			$res['datos'] = $this->cargaProductos($id_venta);
-			$res['total'] = number_format($this->totalProductos($id_venta), 2, '.', ',');
+			$res['datos'] = $this->cargaProductos($idVenta);
+			$res['total'] = number_format($this->Temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
 			$res['error'] = $error;
 			echo json_encode($res);
 		}
 	}
 
-	public function cargaProductos($id_venta)
+	//Elimina producto de tabla temporal por id_producto e id_venta
+	public function eliminaProductoVenta()
 	{
-		$resultado = $this->tmp_mov->porMovimiento($id_venta);
+		if (!$this->input->is_ajax_request()) {
+			return;
+		}
+
+		$this->load->model("Temporal_caja_model");
+
+		$idProducto = $this->input->post('id_producto', TRUE);
+		$idVenta = $this->input->post('id_venta', TRUE);
+
+		$datos = $this->Temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
+
+		if ($datos) {
+			$cantidad = max($datos->cantidad - 1, 0);
+			$subtotal = $cantidad * $datos->precio;
+
+			if ($cantidad > 0) {
+				$this->Temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
+			} else {
+				$this->Temporal_caja_model->eliminar($idProducto, $idVenta);
+			}
+		}
+		$res['datos'] = $this->cargaProductos($idVenta);
+		$res['total'] = number_format($this->Temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
+		$res['error'] = '';
+
+		echo json_encode($res);
+	}
+
+	public function cargaProductos($idVenta)
+	{
+		$this->load->helper('form');
+
+		$resultado = $this->Temporal_caja_model->porVenta($idVenta);
 		$fila = '';
 		$numFila = 0;
 
@@ -117,25 +135,14 @@ class Caja extends CI_Controller
 			$numFila++;
 			$fila .= "<tr id='fila" . $numFila . "'>";
 			$fila .= "<td>" . $numFila . "</td>";
-			$fila .= "<td>" . $row['codigo'] . "</td>";
-			$fila .= "<td>" . $row['nombre'] . "</td>";
-			$fila .= "<td>" . $row['precio'] . "</td>";
-			$fila .= "<td>" . $row['cantidad'] . "</td>";
-			$fila .= "<td>" . $row['subtotal'] . "</td>";
-			$fila .= "<td><a onclick=\"eliminaProducto(" . $row['id_producto'] . ")\" class='borrar'><span class='fas fa-fw fa-trash'></span></a></td>";
+			$fila .= "<td>" . html_escape($row->codigo) . "</td>";
+			$fila .= "<td>" . html_escape($row->nombre) . "</td>";
+			$fila .= "<td>" . $row->precio . "</td>";
+			$fila .= "<td>" . $row->cantidad . "</td>";
+			$fila .= "<td>" . $row->importe . "</td>";
+			$fila .= "<td><a onclick=\"eliminaProducto(" . $row->id_producto . ", '" . $row->id_venta . "')\" class='borrar'><span class='fas fa-fw fa-trash'></span></a></td>";
 			$fila .= "</tr>";
 		}
 		return $fila;
-	}
-
-	public function totalProductos($id_venta)
-	{
-		$resultado = $this->tmp_mov->porMovimiento($id_venta);
-		$total = 0;
-
-		foreach ($resultado as $row) {
-			$total += $row['subtotal'];
-		}
-		return $total;
 	}
 }

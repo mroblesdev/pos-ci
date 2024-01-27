@@ -26,7 +26,7 @@ $idVentaTmp = uniqid();
                     <div class="col-sm-4">
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-barcode"></i></span>
-                            <input class="form-control" id="codigo" name="codigo" type="text" placeholder="Escribe el código y presiona enter" onkeyup="agregarProducto(event, this.value, total.value, '<?php echo $idVentaTmp; ?>')" aria-label="codigo" aria-describedby="basic-addon1" autofocus>
+                            <input class="form-control" id="codigo" name="codigo" type="text" placeholder="Escribe el código y presiona enter" aria-label="codigo" aria-describedby="basic-addon1" autofocus>
                         </div>
                     </div>
 
@@ -70,29 +70,27 @@ $idVentaTmp = uniqid();
     </div>
 </div>
 
-<br>
-
-<div id="modalito" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+<!-- Modal -->
+<div class="modal fade" id="avisoModal" tabindex="-1" aria-labelledby="avisoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Caja</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h1 class="modal-title fs-5" id="avisoModalLabel">Caja</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6>Debe agregar un producto para completar la venta.</h6>
+            <h6>Debe agregar un producto para completar la venta.</h6>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-info" data-dismiss="modal">Aceptar</a>
+            <a class="btn btn-primary" data-bs-dismiss="modal">Aceptar</a>
             </div>
         </div>
     </div>
 </div>
 
+
 <script type="text/javascript">
-    const idVenta = <?php echo $idVentaTmp; ?>
+    const idVenta = '<?php echo $idVentaTmp; ?>'
     const siteUrl = '<?php echo site_url(); ?>'
 
     $(document).ready(function() {
@@ -108,7 +106,7 @@ $idVentaTmp = uniqid();
         })
 
         $("#codigo").autocomplete({
-            source: siteUrl + 'productos/autocompleteData',
+            source: siteUrl + '/productos/autocompleteData',
             minLength: 3,
             focus: function() {
                 return false;
@@ -124,49 +122,64 @@ $idVentaTmp = uniqid();
                     }, 500);
             }
         });
+
+        $("#codigo").on("keyup", function(event) {
+            enviaProducto(event, this.value, 1);
+        });
+
+        $("#completa_venta").click(function() {
+            var nFilas = $("#tablaProductos tr").length;
+
+            if (nFilas < 2) {
+                $('#avisoModal').modal('show');
+            } else {
+                $("#form_venta").submit();
+            }
+        });
     });
 
     function enviaProducto(e, codigo, cantidad) {
         let enterKey = 13;
-        if (e.which == enterKey) {
-            if (codigo != '' && codigo != null && codigo != 0 && cantidad > 0) {
-                agregarProducto(codigo, cantidad);
-            }
+
+        if (e.which === enterKey && codigo && cantidad > 0) {
+            agregarProducto(codigo, cantidad);
         }
     }
 
     function agregarProducto(codigo, cantidad) {
         $.ajax({
             method: "POST",
-            url: siteUrl + 'caja/inserta',
+            url: siteUrl + '/caja/inserta',
             data: {
                 codigo: codigo,
                 cantidad: cantidad,
                 id_venta: idVenta
             },
-            success: function(resultado) {
-                if (resultado != 0) {
-                    $("#codigo").removeClass('has-error');
+            success: function(response) {
+                if (response && response != "") {
                     $('#codigo').autocomplete('close');
                     $("#codigo").val('');
-                    let resultado = JSON.parse(response);
 
-                    if (resultado.error != '') {
-                        $("#resultado_error").html(resultado.error);
-                        $("#codigo").focus();
-                    } else {
-                        $('#tablaProductos tbody').empty();
-                        $("#tablaProductos tbody").append(resultado.datos);
-                        $("#total").val(resultado.total);
-                    }
+                    var resultado = JSON.parse(response);
+
+                    $("#resultado_error").html(resultado.error);
+                    $('#tablaProductos tbody').empty();
+                    $("#tablaProductos tbody").append(resultado.datos);
+                    $("#total").val(resultado.total);
                 }
             }
         });
+        $("#codigo").focus();
     }
 
-    function eliminarProducto(id, idVentaTmp) {
+    function eliminaProducto(idProducto, idVenta) {
         $.ajax({
-            url: '<?php echo base_url(); ?>index.php/caja/eliminarProductoVenta/' + id + '/' + idVentaTmp,
+            method: "POST",
+            url: siteUrl + '/caja/eliminaProductoVenta',
+            data: {
+                id_producto: idProducto,
+                id_venta: idVenta,
+            },
             success: function(response) {
                 if (response == 0) {
                     $(tagCodigo).val('');
