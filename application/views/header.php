@@ -88,7 +88,7 @@ $nombre_sistema = $this->db->get_where("configuracion", array('nombre' => 'tiend
 							Caja
 						</a>
 
-						<a class="nav-link" href="<?php echo site_url('caja'); ?>">
+						<a class="nav-link" href="<?php echo site_url('ventas'); ?>">
 							<div class="sb-nav-link-icon"><i class="fa-solid fa-cart-shopping"></i></div>
 							Ventas
 						</a>
