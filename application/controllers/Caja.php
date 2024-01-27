@@ -3,9 +3,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
- * Controlador de Inicio
+ * Controlador de Caja
  *
- * Esta clase controla las operaciones relacionadas con el panel de inicio.
+ * Esta clase controla las operaciones relacionadas con la caja.
  *
  * @version 1.0
  * @link https://github.com/mroblesdev/pos-ci
@@ -25,7 +25,7 @@ class Caja extends CI_Controller
 		}
 	}
 
-	//Carga vista inicio de sesion
+	// Carga vista de caja
 	public function index()
 	{
 		$this->load->view('header');
@@ -33,101 +33,104 @@ class Caja extends CI_Controller
 		$this->load->view('footer');
 	}
 
+	// Inserta registro a tabla temporal del caja
 	public function inserta()
 	{
+		if (!$this->input->is_ajax_request()) {
+			return;
+		}
+
 		$error = '';
 
-		if ($this->input->is_ajax_request()) {
+		$codigo   = $this->input->post('codigo', TRUE);
+		$cantidad = $this->input->post('cantidad', TRUE);
+		$idVenta = $this->input->post('id_venta', TRUE);
 
-			$codigo   = $this->input->post('codigo', TRUE);
-			$cantidad = $this->input->post('cantidad', TRUE);
-			$idVenta = $this->input->post('id_venta', TRUE);
+		$this->load->model("productos_model");
+		$this->load->model("temporal_caja_model");
 
-			$this->load->model("productos_model");
-			$this->load->model("Temporal_caja_model");
+		$producto = $this->productos_model->porCodigoRes($codigo);
 
-			$producto = $this->productos_model->porCodigoRes($codigo);
+		if (empty($producto)) {
+			$error = 'No existe el producto';
+		} else {
 
-			if (empty($producto)) {
-				$error = 'No existe el producto';
+			$idProducto = $producto->id;
+			$productoCodigo = $producto->codigo;
+			$productoNombre = $producto->nombre;
+			$productoInventariable = $producto->inventariable;
+			$productoExistencia = $producto->existencia;
+			$productoPrecioVenta = $producto->precio_venta;
+
+			$productoVenta = $this->temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
+			$cantidad += $productoVenta ? $productoVenta->cantidad : 0;
+
+			if ($productoInventariable == 1 && $productoExistencia < $cantidad) {
+				$error = 'No hay suficientes existencias';
 			} else {
+				$subtotal = $cantidad * $productoPrecioVenta;
 
-				$idProducto = $producto->id;
-				$productoCodigo = $producto->codigo;
-				$productoNombre = $producto->nombre;
-				$productoInventariable = $producto->inventariable;
-				$productoExistencia = $producto->existencia;
-				$productoPrecioVenta = $producto->precio_venta;
+				$data = [
+					'id_venta' => $idVenta,
+					'id_producto' => $idProducto,
+					'codigo' => $productoCodigo,
+					'nombre' => $productoNombre,
+					'precio' => $productoPrecioVenta,
+					'cantidad' => $cantidad,
+					'importe' => $subtotal,
+				];
 
-				$productoVenta = $this->Temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
-				$cantidad += $productoVenta ? $productoVenta->cantidad : 0;
-
-				if ($productoInventariable == 1 && $productoExistencia < $cantidad) {
-					$error = 'No hay suficientes existencias';
+				if ($productoVenta) {
+					$this->temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
 				} else {
-					$subtotal = $cantidad * $productoPrecioVenta;
-
-					$data = [
-						'id_venta' => $idVenta,
-						'id_producto' => $idProducto,
-						'codigo' => $productoCodigo,
-						'nombre' => $productoNombre,
-						'precio' => $productoPrecioVenta,
-						'cantidad' => $cantidad,
-						'importe' => $subtotal,
-					];
-
-					if ($productoVenta) {
-						$this->Temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
-					} else {
-						$this->Temporal_caja_model->insertar($data);
-					}
+					$this->temporal_caja_model->insertar($data);
 				}
 			}
-
-			$res['datos'] = $this->cargaProductos($idVenta);
-			$res['total'] = number_format($this->Temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
-			$res['error'] = $error;
-			echo json_encode($res);
 		}
+
+		$res['datos'] = $this->cargaProductos($idVenta);
+		$res['total'] = number_format($this->temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
+		$res['error'] = $error;
+		echo json_encode($res);
 	}
 
-	//Elimina producto de tabla temporal por id_producto e id_venta
+	// Elimina producto de tabla temporal por id_producto e id_venta
 	public function eliminaProductoVenta()
 	{
 		if (!$this->input->is_ajax_request()) {
 			return;
 		}
 
-		$this->load->model("Temporal_caja_model");
+		$this->load->model("temporal_caja_model");
 
 		$idProducto = $this->input->post('id_producto', TRUE);
 		$idVenta = $this->input->post('id_venta', TRUE);
 
-		$datos = $this->Temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
+		$datos = $this->temporal_caja_model->porIdProductoVenta($idProducto, $idVenta);
 
 		if ($datos) {
 			$cantidad = max($datos->cantidad - 1, 0);
 			$subtotal = $cantidad * $datos->precio;
 
 			if ($cantidad > 0) {
-				$this->Temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
+				$this->temporal_caja_model->actualizaProductoVenta($idProducto, $idVenta, $cantidad, $subtotal);
 			} else {
-				$this->Temporal_caja_model->eliminar($idProducto, $idVenta);
+				$this->temporal_caja_model->eliminar($idProducto, $idVenta);
 			}
 		}
 		$res['datos'] = $this->cargaProductos($idVenta);
-		$res['total'] = number_format($this->Temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
+		$res['total'] = number_format($this->temporal_caja_model->totalPorVenta($idVenta), 2, '.', ',');
 		$res['error'] = '';
 
 		echo json_encode($res);
 	}
 
+	// Carga los productos de la ventan a una tabla
 	public function cargaProductos($idVenta)
 	{
 		$this->load->helper('form');
 
-		$resultado = $this->Temporal_caja_model->porVenta($idVenta);
+		$resultado = $this->temporal_caja_model->porVenta($idVenta);
 		$fila = '';
 		$numFila = 0;
 

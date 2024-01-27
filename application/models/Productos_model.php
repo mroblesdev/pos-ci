@@ -96,4 +96,11 @@ class Productos_model extends CI_Model
 		$datos = ["activo" => 1];
 		return $this->db->update("productos", $datos, ["id" => $id]);
 	}
+
+	// Actualiza actistencia
+	public function actualizaExistencia($id, $cantidad, $movimiento){
+		$this->db->set('existencia', "existencia $movimiento $cantidad" , FALSE);
+		$this->db->where('id', $id);
+		return $this->db->update("productos");
+	}
 }

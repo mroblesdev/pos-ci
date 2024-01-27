@@ -17,7 +17,6 @@ class Productos extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model("productos_model");
-		$this->load->model('eventos_model');
 		$this->load->helper('form');
 		$this->load->library('form_validation');
 
@@ -97,7 +96,7 @@ class Productos extends CI_Controller
 		$this->load->view('footer');
 	}
 
-	// Valida y actualiza formulario editar
+	// Valida y actualiza registro
 	public function actualizar()
 	{
 		$id = $this->input->post("id");
@@ -135,7 +134,7 @@ class Productos extends CI_Controller
 		$this->editar($id);
 	}
 
-	//Elimina producto
+	// Elimina producto
 	public function eliminar($id = null)
 	{
 		if ($id != null) {
@@ -162,13 +161,13 @@ class Productos extends CI_Controller
 		$order = $this->input->post("order");
 		$search = $this->input->post("search", TRUE);
 		$activo = $this->input->post("activo");
-		$searchValue  = $search['value'];
+		$searchValue = $search['value'];
 		$col = 0;
 		$dir = "";
 
 		$aColumns = array('codigo', 'nombre', 'precio_venta', 'precio_compra', 'existencia', 'id');
-		$sTable = "productos";
-		$sWhere = "activo = $activo";
+		$sTable   = "productos";
+		$sWhere   = "activo = $activo";
 
 		if (!empty($order)) {
 			$col = $order[0]['column'];

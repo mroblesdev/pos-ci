@@ -64,4 +64,8 @@ class Temporal_caja_model extends CI_Model
     {
         return $this->db->delete("temporal_caja", array("id_producto" => $idProducto, "id_venta" => $idVenta));
     }
+
+    public function eliminaVenta($idVenta){
+        return $this->db->delete("temporal_caja", array("id_venta" => $idVenta));
+    }
 }

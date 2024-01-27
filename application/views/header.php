@@ -114,8 +114,6 @@ $nombre_sistema = $this->db->get_where("configuracion", array('nombre' => 'tiend
 							<nav class="sb-sidenav-menu-nested nav">
 								<a class="nav-link" href="<?php echo site_url('configuracion'); ?>">Configuración</a>
 								<a class="nav-link" href="<?php echo site_url('usuarios'); ?>">Usuarios</a>
-								<a class="nav-link" href="<?php echo site_url('roles'); ?>">Roles</a>
-								<a class="nav-link" href="<?php echo site_url('cajas'); ?>">Cajas</a>
 								<a class="nav-link" href="<?php echo site_url('eventos'); ?>">Eventos de acceos</a>
 							</nav>
 						</div>

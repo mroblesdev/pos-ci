@@ -19,7 +19,6 @@ $idVentaTmp = uniqid();
         <form id="form_venta" name="form_venta" method="post" action="<?php echo site_url('ventas/insertar'); ?>" autocomplete="off">
 
             <input type="hidden" id="id_venta" name="id_venta" value="<?php echo $idVentaTmp; ?>">
-            <input id="id_cliente" name="id_cliente" value="1" type="hidden" />
 
             <div class="form-group">
                 <div class="row">
@@ -30,7 +29,7 @@ $idVentaTmp = uniqid();
                         </div>
                     </div>
 
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <label for="codigo" id="resultado_error" style="color:red"></label>
                     </div>
 
@@ -79,10 +78,10 @@ $idVentaTmp = uniqid();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            <h6>Debe agregar un producto para completar la venta.</h6>
+                <h6>Debe agregar un producto para completar la venta.</h6>
             </div>
             <div class="modal-footer">
-            <a class="btn btn-primary" data-bs-dismiss="modal">Aceptar</a>
+                <a class="btn btn-primary" data-bs-dismiss="modal">Aceptar</a>
             </div>
         </div>
     </div>
@@ -100,10 +99,6 @@ $idVentaTmp = uniqid();
                 return false;
             }
         });
-
-        $('#modalito').on('hidden.bs.modal', function(e) {
-            $('#codigo').focus();
-        })
 
         $("#codigo").autocomplete({
             source: siteUrl + '/productos/autocompleteData',
@@ -132,6 +127,20 @@ $idVentaTmp = uniqid();
 
             if (nFilas < 2) {
                 $('#avisoModal').modal('show');
+            } else {
+                $("#form_venta").submit();
+            }
+        });
+
+        $('#avisoModal').on('hidden.bs.modal', function(e) {
+            $('#codigo').focus();
+        })
+
+        $("#completa_venta").click(function() {
+            var nFilas = $("#tablaProductos tr").length;
+
+            if (nFilas < 2) {
+                $('#modalito').modal('show');
             } else {
                 $("#form_venta").submit();
             }
@@ -181,29 +190,18 @@ $idVentaTmp = uniqid();
                 id_venta: idVenta,
             },
             success: function(response) {
-                if (response == 0) {
-                    $(tagCodigo).val('');
-                } else {
+                if (response && response != "") {
+                    $('#codigo').val('');
+
                     var resultado = JSON.parse(response);
+
                     $("#resultado_error").html('');
                     $('#tablaProductos tbody').empty();
                     $("#tablaProductos tbody").append(resultado.datos);
                     $("#total").val(resultado.total);
-                    $("#codigo").val('');
                 }
             }
         });
+        $("#codigo").focus();
     }
-
-    $(function() {
-        $("#completa_venta").click(function() {
-            var nFilas = $("#tablaProductos tr").length;
-
-            if (nFilas < 2) {
-                $('#modalito').modal('show');
-            } else {
-                $("#form_venta").submit();
-            }
-        });
-    });
 </script>

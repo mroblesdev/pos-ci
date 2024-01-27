@@ -21,7 +21,7 @@ class Inicio extends CI_Controller
 		$this->load->library('session');
 	}
 
-	//Carga vista inicio de sesion
+	//Carga vista de inicio
 	public function index()
 	{
 		if ($this->session->userdata('login') === FALSE) {
