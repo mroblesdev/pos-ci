@@ -30,4 +30,9 @@ class Detalle_venta_model extends CI_Model
             "precio"      => $datos['precio'],
         ]);
     }
+
+    public function porIdVenta($idVenta)
+    {
+        return $this->db->get_where("detalle_venta", array("id_venta" => $idVenta))->result();
+    }
 }
